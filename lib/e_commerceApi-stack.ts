@@ -14,8 +14,23 @@ export class EcommerceApiStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: EcommerceApiStackProps) {
     super(scope, id, props);
 
+    const logGroup = new cwlogs.LogGroup(this, 'EcommerceApiLogGroup');
     const api = new apigateway.RestApi(this, 'EcommerceApi', {
-      restApiName: 'ECommerceAPI'
+      restApiName: 'ECommerceAPI',
+      deployOptions: {
+        accessLogDestination: new apigateway.LogGroupLogDestination(logGroup),
+        accessLogFormat: apigateway.AccessLogFormat.jsonWithStandardFields({
+          httpMethod: true,
+          ip: true,
+          protocol: true,
+          requestTime: true,
+          resourcePath: true,
+          responseLength: true,
+          status: true,
+          caller: true,
+          user: true,
+        }),
+      }
     });
 
     const productsFetchIntegration = new apigateway.LambdaIntegration(props.productsFetchHandler);

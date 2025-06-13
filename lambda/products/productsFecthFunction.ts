@@ -27,7 +27,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
     return {
       statusCode: 200,
       body: JSON.stringify({
-        message: "Product fetched by id: ${productId} successfully",
+        message: `Product fetched by id: ${productId} successfully`,
       })
     };
   };

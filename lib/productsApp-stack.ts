@@ -22,8 +22,6 @@ export class ProductsAppStack extends cdk.Stack {
         type: dynamodb.AttributeType.STRING,
       },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // On-demand billing mode
-      readCapacity: 1,
-      writeCapacity: 1
     });
 
     // Define the Lambda function that fetches products from DynamoDB

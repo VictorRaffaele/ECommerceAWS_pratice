@@ -7,6 +7,7 @@ import { Construct } from 'constructs';
 export class ProductsAppStack extends cdk.Stack {
   // Config stack defines the Lambda function for fetching products
   readonly productsFetchHandler: lamdbaNodeJS.NodejsFunction;
+  readonly productsAdminHandler: lamdbaNodeJS.NodejsFunction;
   readonly productsDdb: dynamodb.Table;
 
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -43,7 +44,27 @@ export class ProductsAppStack extends cdk.Stack {
         },
       }
     );
-
+    // Grant read permissions to the fetch handler
     this.productsDdb.grantReadData(this.productsFetchHandler);
+
+    this.productsAdminHandler = new lamdbaNodeJS.NodejsFunction(this, 
+        'ProductsAdminFunction', {
+        runtime: lamdba.Runtime.NODEJS_20_X,
+        functionName: 'ProductsAdminFunction',
+        entry: 'lambda/products/ProductsAdminFunction.ts',
+        handler: 'handler',
+        memorySize: 512,
+        timeout: cdk.Duration.seconds(5),
+        bundling: {
+          minify: true,
+          sourceMap: false,
+        },
+        environment: {
+          PRODUCTS_DDB: this.productsDdb.tableName,
+        },
+      }
+    );
+    // Grant write permissions to the admin handler
+    this.productsDdb.grantWriteData(this.productsAdminHandler);
   }
 }

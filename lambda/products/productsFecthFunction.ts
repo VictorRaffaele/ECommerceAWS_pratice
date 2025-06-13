@@ -10,7 +10,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
   console.log(`${funcTag} API Gateway RequestId: ${lambdaRequestId} - Lambda RequestId: ${apiRequestId}`);
   const method = event.httpMethod;
   if (event.resource === "/products") {
-    if (method === 'GET') {}
+    if (method === 'GET') {
       console.log(`${funcTag} GET /products called`);
 
       return {
@@ -19,7 +19,18 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
           message: "Products fetched successfully",
         })
       };
-  }
+    };
+  } else if (event.resource === "/products/{id}") {
+    const productId = event.pathParameters!.id as string
+    console.log(`${funcTag} GET /products/${productId}`);
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Product fetched by id: ${productId} successfully",
+      })
+    };
+  };
 
   return {
     statusCode: 400,

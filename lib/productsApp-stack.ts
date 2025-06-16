@@ -2,6 +2,7 @@ import * as lamdba from 'aws-cdk-lib/aws-lambda';
 import * as lamdbaNodeJS from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
+import * as ssm from 'aws-cdk-lib/aws-ssm';
 import { Construct } from 'constructs';
 
 export class ProductsAppStack extends cdk.Stack {
@@ -24,6 +25,10 @@ export class ProductsAppStack extends cdk.Stack {
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST, // On-demand billing mode
     });
 
+    // Products Layer
+    const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn');
+    const productsLayer = lamdba.LayerVersion.fromLayerVersionArn(this, 'ProductsLayerVersionArn', productsLayerArn);
+
     // Define the Lambda function that fetches products from DynamoDB
     this.productsFetchHandler = new lamdbaNodeJS.NodejsFunction(this, 
         'ProductsFetchHandler', {
@@ -40,6 +45,7 @@ export class ProductsAppStack extends cdk.Stack {
         environment: {
           PRODUCTS_DDB: this.productsDdb.tableName,
         },
+        layers: [productsLayer],
       }
     );
     // Grant read permissions to the fetch handler
@@ -60,6 +66,7 @@ export class ProductsAppStack extends cdk.Stack {
         environment: {
           PRODUCTS_DDB: this.productsDdb.tableName,
         },
+        layers: [productsLayer],
       }
     );
     // Grant write permissions to the admin handler

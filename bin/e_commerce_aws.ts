@@ -3,6 +3,7 @@ import * as cdk from 'aws-cdk-lib';
 import * as dotenv from 'dotenv';
 import { ProductsAppStack } from '../lib/productsApp-stack';
 import { EcommerceApiStack } from '../lib/e_commerceApi-stack';
+import { ProductsAppLayersStack } from '../lib/productsAppLayers-stack';
 
 dotenv.config();
 const app = new cdk.App();
@@ -16,6 +17,11 @@ const tags = {
   cost: "ECommerce",
   team: "VictorPratice"
 }
+
+const productsAppLayersStack = new ProductsAppLayersStack(app, 'ProductsAppLayers', {
+  tags: tags,
+  env: env,
+});
 
 const productsAppStack = new ProductsAppStack(app, 'ProductsApp', {
   tags: tags,

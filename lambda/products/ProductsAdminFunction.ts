@@ -3,7 +3,7 @@ import { Product, ProductRepository } from "/opt/nodejs/productsLayer";
 import { DynamoDB } from 'aws-sdk';
 import * as AWSXRay from 'aws-xray-sdk-core';
 
-AWSXRay.captureAWS(require('aws-sdk'));
+AWSXRay.captureAWS(require("aws-sdk"));
 const productsDdb = process.env.PRODUCTS_DDB || "";
 const ddbClient = new DynamoDB.DocumentClient();
 const productRepository = new ProductRepository(ddbClient, productsDdb);
@@ -79,13 +79,6 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
             error: (<Error>error).message
           })
         };
-      }
-
-      return {
-        statusCode: 200,
-        body: JSON.stringify({
-          message: `Product with id: ${productId} deleted successfully`,
-        })
       };
     };
   };

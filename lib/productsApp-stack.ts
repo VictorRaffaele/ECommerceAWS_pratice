@@ -50,6 +50,7 @@ export class ProductsAppStack extends cdk.Stack {
         },
         layers: [productsLayer],
         tracing: lamdba.Tracing.ACTIVE,
+        insightsVersion: lamdba.LambdaInsightsVersion.VERSION_1_0_119_0,
       }
     );
     // Grant read permissions to the fetch handler
@@ -74,6 +75,8 @@ export class ProductsAppStack extends cdk.Stack {
           PRODUCTS_DDB: this.productsDdb.tableName,
         },
         layers: [productsLayer],
+        tracing: lamdba.Tracing.ACTIVE,
+        insightsVersion: lamdba.LambdaInsightsVersion.VERSION_1_0_119_0,
       }
     );
     // Grant write permissions to the admin handler

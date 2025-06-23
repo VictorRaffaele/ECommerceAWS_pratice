@@ -1,4 +1,4 @@
-export enum ProductEventTye {
+export enum ProductEventType {
   CREATED = 'PRODUCT_CREATED',
   UPDATED = 'PRODUCT_UPDATED',
   DELETED = 'PRODUCT_DELETED',
@@ -6,7 +6,7 @@ export enum ProductEventTye {
 
 export interface ProductEvent {
   resquestId: string;
-  eventType: ProductEventTye;
+  eventType: ProductEventType;
   productId: string;
   productCode: string;
   productPrice: number;

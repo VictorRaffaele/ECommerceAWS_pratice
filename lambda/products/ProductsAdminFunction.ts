@@ -7,7 +7,7 @@ import { send } from "process";
 
 AWSXRay.captureAWS(require('aws-sdk'));
 const productsDdb = process.env.PRODUCTS_DDB!;
-const ProductsEventsFunctionName = process.env.PRODUCTS_EVENTS_FUNCTION_NAME!;
+const ProductsEventsFunctionName = process.env.PRODUCTS_EVENTS_FUNCTION!;
 const ddbClient = new DynamoDB.DocumentClient();
 const lambdaClient = new Lambda();
 const productRepository = new ProductRepository(ddbClient, productsDdb);
@@ -102,7 +102,7 @@ export async function handler(event: APIGatewayProxyEvent, context: Context): Pr
   };
 };
 
-function sendProductEvent(product: Product, eventType: ProductEventType, email: string, lambdaRequestId: string) {
+async function sendProductEvent(product: Product, eventType: ProductEventType, email: string, lambdaRequestId: string) {
   const event: ProductEvent = {
     email: email,
     eventType: eventType,

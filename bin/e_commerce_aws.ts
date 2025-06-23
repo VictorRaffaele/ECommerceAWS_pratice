@@ -4,7 +4,7 @@ import * as dotenv from 'dotenv';
 import { ProductsAppStack } from '../lib/productsApp-stack';
 import { EcommerceApiStack } from '../lib/e_commerceApi-stack';
 import { ProductsAppLayersStack } from '../lib/productsAppLayers-stack';
-import { EventDdbStack } from 'lib/eventDdb-stack';
+import { EventDdbStack } from '../lib/eventDdb-stack';
 
 dotenv.config();
 const app = new cdk.App();

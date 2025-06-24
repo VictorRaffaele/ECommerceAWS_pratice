@@ -5,6 +5,8 @@ import { ProductsAppStack } from '../lib/productsApp-stack';
 import { EcommerceApiStack } from '../lib/e_commerceApi-stack';
 import { ProductsAppLayersStack } from '../lib/productsAppLayers-stack';
 import { EventDdbStack } from '../lib/eventDdb-stack';
+import { OrdersAppLayersStack } from '../lib/ordersAppLayers-stack';
+import { OrdersAppStack } from '../lib/ordersApp-stack';
 
 dotenv.config();
 const app = new cdk.App();
@@ -37,11 +39,25 @@ const productsAppStack = new ProductsAppStack(app, 'ProductsApp', {
 productsAppStack.addDependency(productsAppLayersStack);
 productsAppStack.addDependency(eventDdbStack);
 
-
-const ECommerceApiStack = new EcommerceApiStack(app, 'EcommerceApi', {
-  productsFetchHandler: productsAppStack.productsFetchHandler,
-  productsAdminHandler: productsAppStack.productsAdminHandler,
+const ordersAppLayersStack = new OrdersAppLayersStack(app, 'OrdersAppLayers', {
   tags: tags,
   env: env,
 });
-ECommerceApiStack.addDependency(productsAppStack);
+
+const ordersAppStack = new OrdersAppStack(app, 'OrdersApp', {
+  productsDdb: productsAppStack.productsDdb,
+  tags: tags,
+  env: env,
+});
+ordersAppStack.addDependency(ordersAppLayersStack);
+ordersAppStack.addDependency(productsAppStack);
+
+const eCommerceApiStack = new EcommerceApiStack(app, 'EcommerceApi', {
+  productsFetchHandler: productsAppStack.productsFetchHandler,
+  productsAdminHandler: productsAppStack.productsAdminHandler,
+  ordersHandler: ordersAppStack.ordersHandler,
+  tags: tags,
+  env: env,
+});
+eCommerceApiStack.addDependency(productsAppStack);
+eCommerceApiStack.addDependency(ordersAppStack);

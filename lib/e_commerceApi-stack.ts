@@ -8,6 +8,7 @@ import { Construct } from 'constructs';
 interface EcommerceApiStackProps extends cdk.StackProps {
   productsFetchHandler: lamdbaNodeJS.NodejsFunction;
   productsAdminHandler: lamdbaNodeJS.NodejsFunction;
+  ordersHandler: lamdbaNodeJS.NodejsFunction;
 }
 
 export class EcommerceApiStack extends cdk.Stack {
@@ -36,6 +37,36 @@ export class EcommerceApiStack extends cdk.Stack {
     });
 
     this.productsService(props, api);
+    this.ordersService(props, api);
+  }
+
+  private ordersService(props: EcommerceApiStackProps, api: apigateway.RestApi) {
+    const ordersIntegration = new apigateway.LambdaIntegration(props.ordersHandler);
+
+    // resource - /orders
+    const ordersResource = api.root.addResource('orders');
+
+    // GET /orders
+    // GET /orders?email={email}
+    // GET /orders?email={email}&orderId={orderId}
+    ordersResource.addMethod('GET', ordersIntegration);
+
+    // POST /orders
+    ordersResource.addMethod('POST', ordersIntegration);
+
+    const orderDeletetionValidator = new apigateway.RequestValidator(this, 'OrderDeletionValidator', {
+      restApi: api,
+      requestValidatorName: 'OrderDeletionValidator',
+      validateRequestParameters: true,
+    });
+    // DELETE /orders?email={email}&orderId={orderId}
+    ordersResource.addMethod('DELETE', ordersIntegration, {
+      requestParameters: {
+        'method.request.querystring.email': true,
+        'method.request.querystring.orderId': true,
+      },
+      requestValidator: orderDeletetionValidator
+    });
   }
 
   private productsService(props: EcommerceApiStackProps, api: apigateway.RestApi) {

@@ -1,5 +1,5 @@
-import * as lamdba from 'aws-cdk-lib/aws-lambda';
-import * as lamdbaNodeJS from 'aws-cdk-lib/aws-lambda-nodejs';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as lambdaNodeJS from 'aws-cdk-lib/aws-lambda-nodejs';
 import * as cdk from 'aws-cdk-lib';
 import * as dynamodb from 'aws-cdk-lib/aws-dynamodb';
 import * as ssm from 'aws-cdk-lib/aws-ssm';
@@ -11,8 +11,8 @@ interface productsAppStackProps extends cdk.StackProps {
 
 export class ProductsAppStack extends cdk.Stack {
   // Config stack defines the Lambda function for fetching products
-  readonly productsFetchHandler: lamdbaNodeJS.NodejsFunction;
-  readonly productsAdminHandler: lamdbaNodeJS.NodejsFunction;
+  readonly productsFetchHandler: lambdaNodeJS.NodejsFunction;
+  readonly productsAdminHandler: lambdaNodeJS.NodejsFunction;
   readonly productsDdb: dynamodb.Table;
 
   constructor(scope: Construct, id: string, props: productsAppStackProps) {
@@ -31,15 +31,15 @@ export class ProductsAppStack extends cdk.Stack {
 
     // Products Layer
     const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn');
-    const productsLayer = lamdba.LayerVersion.fromLayerVersionArn(this, 'ProductsLayerVersionArn', productsLayerArn);
+    const productsLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'ProductsLayerVersionArn', productsLayerArn);
 
     // Product Events Layer
     const productEventsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductEventsLayerVersionArn');
-    const productEventsLayer = lamdba.LayerVersion.fromLayerVersionArn(this, 'ProductEventsLayerVersionArn', productEventsLayerArn);
+    const productEventsLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'ProductEventsLayerVersionArn', productEventsLayerArn);
 
-    const productEventHandler =  new lamdbaNodeJS.NodejsFunction(this, 
+    const productEventHandler =  new lambdaNodeJS.NodejsFunction(this, 
         'ProductsEventsFunction', {
-        runtime: lamdba.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_20_X,
         functionName: 'ProductsEventsFunction',
         entry: 'lambda/products/productsEventsFunction.ts',
         handler: 'handler',
@@ -56,16 +56,16 @@ export class ProductsAppStack extends cdk.Stack {
           EVENTS_DDB: props.eventDdb.tableName,
         },
         layers: [productEventsLayer],
-        tracing: lamdba.Tracing.ACTIVE,
-        insightsVersion: lamdba.LambdaInsightsVersion.VERSION_1_0_119_0,
+        tracing: lambda.Tracing.ACTIVE,
+        insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
       }
     );
     props.eventDdb.grantWriteData(productEventHandler);
 
     // Define the Lambda function that fetches products from DynamoDB
-    this.productsFetchHandler = new lamdbaNodeJS.NodejsFunction(this, 
+    this.productsFetchHandler = new lambdaNodeJS.NodejsFunction(this, 
         'ProductsFetchHandler', {
-        runtime: lamdba.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_20_X,
         functionName: 'ProductsFetchFunction',
         entry: 'lambda/products/productsFecthFunction.ts',
         handler: 'handler',
@@ -82,16 +82,16 @@ export class ProductsAppStack extends cdk.Stack {
           PRODUCTS_DDB: this.productsDdb.tableName,
         },
         layers: [productsLayer],
-        tracing: lamdba.Tracing.ACTIVE,
-        insightsVersion: lamdba.LambdaInsightsVersion.VERSION_1_0_119_0,
+        tracing: lambda.Tracing.ACTIVE,
+        insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
       }
     );
     // Grant read permissions to the fetch handler
     this.productsDdb.grantReadData(this.productsFetchHandler);
 
-    this.productsAdminHandler = new lamdbaNodeJS.NodejsFunction(this, 
+    this.productsAdminHandler = new lambdaNodeJS.NodejsFunction(this, 
         'ProductsAdminFunction', {
-        runtime: lamdba.Runtime.NODEJS_20_X,
+        runtime: lambda.Runtime.NODEJS_20_X,
         functionName: 'ProductsAdminFunction',
         entry: 'lambda/products/ProductsAdminFunction.ts',
         handler: 'handler',
@@ -109,8 +109,8 @@ export class ProductsAppStack extends cdk.Stack {
           PRODUCTS_EVENTS_FUNCTION: productEventHandler.functionName,
         },
         layers: [productsLayer, productEventsLayer],
-        tracing: lamdba.Tracing.ACTIVE,
-        insightsVersion: lamdba.LambdaInsightsVersion.VERSION_1_0_119_0,
+        tracing: lambda.Tracing.ACTIVE,
+        insightsVersion: lambda.LambdaInsightsVersion.VERSION_1_0_119_0,
       }
     );
     // Grant write permissions to the admin handler

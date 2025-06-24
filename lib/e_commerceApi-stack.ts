@@ -35,6 +35,10 @@ export class EcommerceApiStack extends cdk.Stack {
       }
     });
 
+    this.productsService(props, api);
+  }
+
+  private productsService(props: EcommerceApiStackProps, api: apigateway.RestApi) {
     const productsFetchIntegration = new apigateway.LambdaIntegration(props.productsFetchHandler);
 
     // GET /products
@@ -42,7 +46,7 @@ export class EcommerceApiStack extends cdk.Stack {
     productsResource.addMethod('GET', productsFetchIntegration);
 
     // /products/{id}
-    const productsIdResoutce = productsResource.addResource('{id}')
+    const productsIdResoutce = productsResource.addResource('{id}');
     productsIdResoutce.addMethod('GET', productsFetchIntegration);
 
     const productsAdminIntegration = new apigateway.LambdaIntegration(props.productsAdminHandler);

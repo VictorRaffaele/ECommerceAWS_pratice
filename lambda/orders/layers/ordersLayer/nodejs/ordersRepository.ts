@@ -57,7 +57,7 @@ export class OrdersRepository {
     return data.Items as Order[];
   }
 
-  async getOrderByEmail(email: string, orderId?: string): Promise<Order[]> {
+  async getOrderByEmail(email: string): Promise<Order[]> {
     const funcTag = 'getOrderByEmail';
     console.log(`${funcTag} Fetching orders for email: ${email}`);
 

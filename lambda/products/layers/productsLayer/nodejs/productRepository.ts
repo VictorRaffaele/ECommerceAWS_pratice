@@ -52,6 +52,25 @@ export class ProductRepository {
     return data.Item as Product;
   }
 
+  async getProductByIds(productIds: string[]): Promise<Product[]> {
+    const funcTag = 'getProductByIds';
+    console.log(`${funcTag} Fetching products with IDs: ${productIds.join(', ')}`);
+    
+    const keys: {id: string;}[] = []
+    productIds.forEach(productId => {
+      keys.push({ id: productId });
+    });
+    const data = this.ddbClient.batchGet({
+      RequestItems: {
+        [this.productsDdb]: {
+          Keys: keys
+        }
+      }
+    }).promise();
+    return (await data).Responses![this.productsDdb] as Product[];
+  }
+
+
   async createProduct(product: Product): Promise<Product> {
     const funcTag = 'createProduct';
     console.log(`${funcTag} Creating product with name: ${product.productName}`);

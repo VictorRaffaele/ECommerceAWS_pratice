@@ -16,7 +16,7 @@ export class OrdersAppStack extends cdk.Stack {
     super(scope, id, props);
 
     const orderDdb = new dynamodb.Table(this, 'OrdersDdb', {
-      tableName: 'orders',
+      tableName: 'Orders',
       partitionKey: {
         name: 'pk',
         type: dynamodb.AttributeType.STRING,

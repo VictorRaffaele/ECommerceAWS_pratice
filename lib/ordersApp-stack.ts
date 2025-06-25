@@ -35,8 +35,8 @@ export class OrdersAppStack extends cdk.Stack {
     const ordersLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'OrderLayerVersionArn', ordersLayerArn);
 
     // Orders API Layer
-    const ordersApiLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ordersApiLayerArn');
-    const ordersApiLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'ordersApiLayerArn', ordersApiLayerArn);
+    const ordersApiLayerArn = ssm.StringParameter.valueForStringParameter(this, 'OrderApiLayerVersionArn');
+    const ordersApiLayer = lambda.LayerVersion.fromLayerVersionArn(this, 'OrderApiLayerVersionArn', ordersApiLayerArn);
 
     // Products Layer
     const productsLayerArn = ssm.StringParameter.valueForStringParameter(this, 'ProductsLayerVersionArn');

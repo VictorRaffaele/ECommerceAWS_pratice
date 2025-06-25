@@ -56,9 +56,9 @@ export class ProductRepository {
     const funcTag = 'getProductByIds';
     console.log(`${funcTag} Fetching products with IDs: ${productIds.join(', ')}`);
     
-    const keys: {id: string;}[] = []
-    productIds.forEach(productId => {
-      keys.push({ id: productId });
+    const keys: {productId: string;}[] = []
+    productIds.forEach(id => {
+      keys.push({ productId: id });
     });
     const data = this.ddbClient.batchGet({
       RequestItems: {

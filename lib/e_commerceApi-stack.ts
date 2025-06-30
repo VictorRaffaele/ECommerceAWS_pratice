@@ -52,7 +52,49 @@ export class EcommerceApiStack extends cdk.Stack {
     ordersResource.addMethod('GET', ordersIntegration);
 
     // POST /orders
-    ordersResource.addMethod('POST', ordersIntegration);
+    const orderRequestValidator = new apigateway.RequestValidator(this, 'OrderRequestValidator', {
+      restApi: api,
+      requestValidatorName: 'OrderRequestValidator',
+      validateRequestBody: true,
+    })
+    const orderModel = new apigateway.Model(this, 'OrderModel', {
+      modelName: 'OrderModel',
+      restApi: api,
+      schema: {
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          email: { type: apigateway.JsonSchemaType.STRING },
+          productId: { 
+            type: apigateway.JsonSchemaType.STRING,
+            minItems: 1,
+            items: { type: apigateway.JsonSchemaType.STRING }
+          },
+          payment: { 
+            type: apigateway.JsonSchemaType.STRING,
+            enum: ['CASH', 'DEBIT_CARD', 'CREDIT_CARD', 'PIX']
+          },
+          shipping: {
+            type: apigateway.JsonSchemaType.OBJECT,
+            properties: {
+              type: { 
+                type: apigateway.JsonSchemaType.STRING,
+                enum: ['ECONOMIC', 'URGENT']
+              },
+              carrier: { 
+                type: apigateway.JsonSchemaType.STRING,
+                enum: ['CORREIOS', 'SEDEX']
+              }
+            },
+            required: ['type', 'carrier']
+          }
+        },
+        required: ['email', 'productId', 'payment'],
+      },
+    });
+    ordersResource.addMethod('POST', ordersIntegration, {
+      requestValidator: orderRequestValidator,
+      requestModels: { 'application/json': orderModel }
+    });
 
     const orderDeletetionValidator = new apigateway.RequestValidator(this, 'OrderDeletionValidator', {
       restApi: api,

@@ -124,11 +124,37 @@ export class EcommerceApiStack extends cdk.Stack {
 
     const productsAdminIntegration = new apigateway.LambdaIntegration(props.productsAdminHandler);
 
+    const productsRequestValidator = new apigateway.RequestValidator(this, 'ProductsRequestValidator', {
+      restApi: api,
+      requestValidatorName: 'ProductsRequestValidator',
+      validateRequestBody: true,
+    })
+    const productsAdminModel = new apigateway.Model(this, 'ProductsAdminModel', {
+      modelName: 'ProductsAdminModel',
+      restApi: api,
+      schema: {
+        type: apigateway.JsonSchemaType.OBJECT,
+        properties: {
+          productName: { type: apigateway.JsonSchemaType.STRING },
+          code: { type: apigateway.JsonSchemaType.STRING },
+          model: { type: apigateway.JsonSchemaType.STRING },
+          price: { type: apigateway.JsonSchemaType.NUMBER },
+          productUrl: { type: apigateway.JsonSchemaType.STRING },
+        },
+      required: ['productName', 'code']
+      },
+    });
     // POST /products
-    productsResource.addMethod('POST', productsAdminIntegration);
+    productsResource.addMethod('POST', productsAdminIntegration, {
+      requestValidator: productsRequestValidator,
+      requestModels: { 'application/json': productsAdminModel }
+    });
 
     // PUT /products/{id}
-    productsIdResoutce.addMethod('PUT', productsAdminIntegration);
+    productsIdResoutce.addMethod('PUT', productsAdminIntegration, {
+      requestValidator: productsRequestValidator,
+      requestModels: { 'application/json': productsAdminModel }
+    });
 
     // DELETE /products/{id}
     productsIdResoutce.addMethod('DELETE', productsAdminIntegration);
